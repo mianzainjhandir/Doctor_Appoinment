@@ -193,7 +193,7 @@ class LogInPage extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(17),
                   child: Image.asset(
-                    'assets/images/img_1.png',
+                    'assets/images/img_6.png',
                     width: double.infinity,
                     height: double.infinity,
                     fit: BoxFit.cover,
