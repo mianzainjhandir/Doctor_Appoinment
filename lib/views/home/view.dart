@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webdocappoinment/views/logIn/view.dart';
+import 'package:webdocappoinment/views/signUp/view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -162,7 +163,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       // Sign Up Button
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(() => const SignUpPage());
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2563EB),
                           foregroundColor: Colors.white,
