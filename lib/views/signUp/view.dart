@@ -4,36 +4,15 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../widget/textfield.dart';
 import '../logIn/view.dart';
+import 'logic.dart';
 
-class SignUpPage extends StatefulWidget {
+class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
-}
-
-class _SignUpPageState extends State<SignUpPage> {
-  bool isPatientSelected = true;
-  bool isTermsAccepted = false;
-
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController doctorLicenseController = TextEditingController();
-
-  @override
-  void dispose() {
-    fullNameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    passwordController.dispose();
-    doctorLicenseController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final SignUpController controller = Get.put(SignUpController());
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: LayoutBuilder(
@@ -72,7 +51,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                             ],
                           ),
-                          child: _buildFormContent(context, isWeb: true),
+                          child: _buildFormContent(context, controller, isWeb: true),
                         ),
                       ),
                     ),
@@ -101,7 +80,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ],
                     ),
-                    child: _buildFormContent(context, isWeb: false),
+                    child: _buildFormContent(context, controller, isWeb: false),
                   ),
                 ),
               ),
@@ -273,7 +252,8 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   // ================= FORM CONTENT =================
-  Widget _buildFormContent(BuildContext context, {required bool isWeb}) {
+  Widget _buildFormContent(BuildContext context, SignUpController controller,
+      {required bool isWeb}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -366,101 +346,96 @@ class _SignUpPageState extends State<SignUpPage> {
         const SizedBox(height: 24),
 
         // Role Switcher Tabs (Patient vs Doctor)
-        Container(
-          height: 46,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            children: [
-              // Patient Tab
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isPatientSelected = true;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: isPatientSelected
-                          ? Colors.white
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: isPatientSelected
-                          ? const [
-                              BoxShadow(
-                                color: Color(0x0A000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
-                              ),
-                            ]
-                          : [],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Patient',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: isPatientSelected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
+        Obx(() {
+          final bool isPatientSelected = controller.isPatientSelected.value;
+          return Container(
+            height: 46,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.all(4),
+            child: Row(
+              children: [
+                // Patient Tab
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => controller.toggleRole(true),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
                         color: isPatientSelected
-                            ? const Color(0xFF2563EB)
-                            : const Color(0xFF64748B),
+                            ? Colors.white
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: isPatientSelected
+                            ? const [
+                                BoxShadow(
+                                  color: Color(0x0A000000),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Patient',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: isPatientSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: isPatientSelected
+                              ? const Color(0xFF2563EB)
+                              : const Color(0xFF64748B),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              // Doctor Tab
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isPatientSelected = false;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: !isPatientSelected
-                          ? Colors.white
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: !isPatientSelected
-                          ? const [
-                              BoxShadow(
-                                color: Color(0x0A000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
-                              ),
-                            ]
-                          : [],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Doctor',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: !isPatientSelected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
+                // Doctor Tab
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => controller.toggleRole(false),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
                         color: !isPatientSelected
-                            ? const Color(0xFF2563EB)
-                            : const Color(0xFF64748B),
+                            ? Colors.white
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: !isPatientSelected
+                            ? const [
+                                BoxShadow(
+                                  color: Color(0x0A000000),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Doctor',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: !isPatientSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: !isPatientSelected
+                              ? const Color(0xFF2563EB)
+                              : const Color(0xFF64748B),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
         const SizedBox(height: 20),
 
         // Full Name Field
@@ -474,7 +449,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         const SizedBox(height: 8),
         CustomTextField(
-          controller: fullNameController,
+          controller: controller.fullNameController,
           hintText: 'Enter your full name',
           prefixIcon: Icons.person_outline_rounded,
           focusColor: const Color(0xFF2563EB),
@@ -492,7 +467,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         const SizedBox(height: 8),
         CustomTextField(
-          controller: emailController,
+          controller: controller.emailController,
           hintText: 'you@example.com',
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
@@ -511,7 +486,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         const SizedBox(height: 8),
         CustomTextField(
-          controller: phoneController,
+          controller: controller.phoneController,
           hintText: '+92 300 1234567',
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
@@ -520,24 +495,32 @@ class _SignUpPageState extends State<SignUpPage> {
         const SizedBox(height: 16),
 
         // Doctor License Field (If Doctor Role Selected)
-        if (!isPatientSelected) ...[
-          Text(
-            'Medical License / Reg Number',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF334155),
-            ),
-          ),
-          const SizedBox(height: 8),
-          CustomTextField(
-            controller: doctorLicenseController,
-            hintText: 'e.g. PMC-123456',
-            prefixIcon: Icons.badge_outlined,
-            focusColor: const Color(0xFF2563EB),
-          ),
-          const SizedBox(height: 16),
-        ],
+        Obx(() {
+          if (!controller.isPatientSelected.value) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Medical License / Reg Number',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF334155),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                CustomTextField(
+                  controller: controller.doctorLicenseController,
+                  hintText: 'e.g. PMC-123456',
+                  prefixIcon: Icons.badge_outlined,
+                  focusColor: const Color(0xFF2563EB),
+                ),
+                const SizedBox(height: 16),
+              ],
+            );
+          }
+          return const SizedBox.shrink();
+        }),
 
         // Password Field
         Text(
@@ -550,7 +533,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         const SizedBox(height: 8),
         CustomTextField(
-          controller: passwordController,
+          controller: controller.passwordController,
           hintText: 'Create a password',
           prefixIcon: Icons.lock_outline_rounded,
           isPassword: true,
@@ -559,95 +542,105 @@ class _SignUpPageState extends State<SignUpPage> {
         const SizedBox(height: 16),
 
         // Terms & Conditions Checkbox
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 24,
-              width: 24,
-              child: Checkbox(
-                value: isTermsAccepted,
-                activeColor: const Color(0xFF2563EB),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+        Obx(() {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 24,
+                width: 24,
+                child: Checkbox(
+                  value: controller.isTermsAccepted.value,
+                  activeColor: const Color(0xFF2563EB),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  onChanged: (value) => controller.toggleTerms(value),
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    isTermsAccepted = value ?? false;
-                  });
-                },
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Wrap(
-                children: [
-                  Text(
-                    'I agree to the ',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: const Color(0xFF64748B),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      'Terms & Conditions ',
+              const SizedBox(width: 8),
+              Expanded(
+                child: Wrap(
+                  children: [
+                    Text(
+                      'I agree to the ',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2563EB),
+                        color: const Color(0xFF64748B),
                       ),
                     ),
-                  ),
-                  Text(
-                    'and ',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: const Color(0xFF64748B),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Text(
+                        'Terms & Conditions ',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF2563EB),
+                        ),
+                      ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      'Privacy Policy',
+                    Text(
+                      'and ',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2563EB),
+                        color: const Color(0xFF64748B),
                       ),
                     ),
-                  ),
-                ],
+                    GestureDetector(
+                      onTap: () {},
+                      child: Text(
+                        'Privacy Policy',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF2563EB),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        }),
         const SizedBox(height: 24),
 
         // Create Account Action Button
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2563EB),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+        Obx(() {
+          final bool isLoading = controller.isLoading.value;
+          return SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : () => controller.signUpUser(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2563EB),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+              child: isLoading
+                  ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Create Account',
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
-            child: Text(
-              'Create Account',
-              style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
+          );
+        }),
         const SizedBox(height: 24),
 
         // Footer Navigation to Log In
@@ -680,4 +673,5 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 }
+
 
