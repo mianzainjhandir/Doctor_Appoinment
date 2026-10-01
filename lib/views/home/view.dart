@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:webdocappoinment/views/logIn/view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -136,7 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       // Login Button
                       OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(()=> LogInPage());
+                        },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFF2563EB),
                           side: const BorderSide(color: Color(0xFFBFDBFE)),
