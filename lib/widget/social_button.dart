@@ -52,7 +52,7 @@ class SocialLoginButtons extends StatelessWidget {
             // Google
             _socialButton(
               imagePath: "assets/images/google1.png",
-              text: "Google",
+              text: "Continue with Google",
               onTap: onGoogleTap,
             ),
 
@@ -60,8 +60,8 @@ class SocialLoginButtons extends StatelessWidget {
 
             // Facebook
             _socialButton(
-              imagePath: "assets/images/img_2.png",
-              text: "Facebook",
+              imagePath: "assets/images/img_4.png",
+              text: "Continue with Apple",
               onTap: onMicroSoftTap,
             ),
           ],
