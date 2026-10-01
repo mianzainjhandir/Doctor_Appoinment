@@ -1,35 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../widget/social_button.dart';
 import '../../widget/textfield.dart';
+import '../signUp/view.dart';
+import 'logic.dart';
 
-class LogInPage extends StatefulWidget {
+class LogInPage extends StatelessWidget {
   const LogInPage({super.key});
 
   @override
-  State<LogInPage> createState() => _LogInPageState();
-}
-
-class _LogInPageState extends State<LogInPage> {
-  bool isPatientSelected = true;
-
-  final TextEditingController patientEmailController = TextEditingController();
-  final TextEditingController patientPasswordController = TextEditingController();
-
-  final TextEditingController adminEmailController = TextEditingController();
-  final TextEditingController adminPasswordController = TextEditingController();
-
-  @override
-  void dispose() {
-    patientEmailController.dispose();
-    patientPasswordController.dispose();
-    adminEmailController.dispose();
-    adminPasswordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final LogInController controller = Get.put(LogInController());
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: LayoutBuilder(
@@ -68,7 +51,7 @@ class _LogInPageState extends State<LogInPage> {
                               ),
                             ],
                           ),
-                          child: _buildFormContent(context, isWeb: true),
+                          child: _buildFormContent(context, controller, isWeb: true),
                         ),
                       ),
                     ),
@@ -97,7 +80,7 @@ class _LogInPageState extends State<LogInPage> {
                         ),
                       ],
                     ),
-                    child: _buildFormContent(context, isWeb: false),
+                    child: _buildFormContent(context, controller, isWeb: false),
                   ),
                 ),
               ),
@@ -189,19 +172,40 @@ class _LogInPageState extends State<LogInPage> {
           ),
           const SizedBox(height: 30),
 
-          // Illustration Image
+          // Illustration Image Showcase
           Expanded(
             child: Center(
-              child: Image.asset(
-                'assets/images/img_3.png',
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.health_and_safety_outlined,
-                    size: 140,
-                    color: Color(0xFF2563EB),
-                  );
-                },
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxHeight: 330),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white, width: 3),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x0F000000),
+                      blurRadius: 18,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(17),
+                  child: Image.asset(
+                    'assets/images/img_1.png',
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.health_and_safety_outlined,
+                        size: 100,
+                        color: Color(0xFF2563EB),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
@@ -248,7 +252,8 @@ class _LogInPageState extends State<LogInPage> {
   }
 
   // ================= FORM CONTENT =================
-  Widget _buildFormContent(BuildContext context, {required bool isWeb}) {
+  Widget _buildFormContent(BuildContext context, LogInController controller,
+      {required bool isWeb}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -259,6 +264,8 @@ class _LogInPageState extends State<LogInPage> {
               onPressed: () {
                 if (Navigator.canPop(context)) {
                   Navigator.pop(context);
+                } else {
+                  Get.back();
                 }
               },
               icon: const Icon(Icons.arrow_back, color: Color(0xFF334155)),
@@ -339,175 +346,140 @@ class _LogInPageState extends State<LogInPage> {
         const SizedBox(height: 24),
 
         // Role Switcher (Patient vs Admin/Doctor)
-        Container(
-          height: 46,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            children: [
-              // Patient Tab
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isPatientSelected = true;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: isPatientSelected
-                          ? Colors.white
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: isPatientSelected
-                          ? const [
-                              BoxShadow(
-                                color: Color(0x0A000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
-                              ),
-                            ]
-                          : [],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Patient',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: isPatientSelected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
+        Obx(() {
+          final bool isPatientSelected = controller.isPatientSelected.value;
+          return Container(
+            height: 46,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.all(4),
+            child: Row(
+              children: [
+                // Patient Tab
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => controller.toggleRole(true),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
                         color: isPatientSelected
-                            ? const Color(0xFF2563EB)
-                            : const Color(0xFF64748B),
+                            ? Colors.white
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: isPatientSelected
+                            ? const [
+                                BoxShadow(
+                                  color: Color(0x0A000000),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Patient',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: isPatientSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: isPatientSelected
+                              ? const Color(0xFF2563EB)
+                              : const Color(0xFF64748B),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              // Admin / Doctor Tab
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isPatientSelected = false;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: !isPatientSelected
-                          ? Colors.white
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: !isPatientSelected
-                          ? const [
-                              BoxShadow(
-                                color: Color(0x0A000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
-                              ),
-                            ]
-                          : [],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Admin / Doctor',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: !isPatientSelected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
+                // Admin / Doctor Tab
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => controller.toggleRole(false),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
                         color: !isPatientSelected
-                            ? const Color(0xFF2563EB)
-                            : const Color(0xFF64748B),
+                            ? Colors.white
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: !isPatientSelected
+                            ? const [
+                                BoxShadow(
+                                  color: Color(0x0A000000),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Admin / Doctor',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: !isPatientSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: !isPatientSelected
+                              ? const Color(0xFF2563EB)
+                              : const Color(0xFF64748B),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
         const SizedBox(height: 20),
 
-        // Conditional Form Fields
-        if (isPatientSelected) ...[
-          // PATIENT FORM
-          Text(
-            'Email or Phone Number',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF334155),
-            ),
-          ),
-          const SizedBox(height: 8),
-          CustomTextField(
-            controller: patientEmailController,
-            hintText: 'you@example.com',
-            prefixIcon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-            focusColor: const Color(0xFF2563EB),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Password',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF334155),
-            ),
-          ),
-          const SizedBox(height: 8),
-          CustomTextField(
-            controller: patientPasswordController,
-            hintText: 'Enter your password',
-            prefixIcon: Icons.lock_outline_rounded,
-            isPassword: true,
-            focusColor: const Color(0xFF2563EB),
-          ),
-        ] else ...[
-          // ADMIN FORM
-          Text(
-            'Admin / Doctor ID or Email',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF334155),
-            ),
-          ),
-          const SizedBox(height: 8),
-          CustomTextField(
-            controller: adminEmailController,
-            hintText: 'admin@healthai.com or ID',
-            prefixIcon: Icons.badge_outlined,
-            keyboardType: TextInputType.emailAddress,
-            focusColor: const Color(0xFF2563EB),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Admin Password',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF334155),
-            ),
-          ),
-          const SizedBox(height: 8),
-          CustomTextField(
-            controller: adminPasswordController,
-            hintText: 'Enter admin passcode',
-            prefixIcon: Icons.admin_panel_settings_outlined,
-            isPassword: true,
-            focusColor: const Color(0xFF2563EB),
-          ),
-        ],
+        // Form Fields (Dynamic Label according to Role)
+        Obx(() {
+          final bool isPatient = controller.isPatientSelected.value;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isPatient ? 'Email or Phone Number' : 'Doctor / Admin Email',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF334155),
+                ),
+              ),
+              const SizedBox(height: 8),
+              CustomTextField(
+                controller: controller.emailController,
+                hintText: isPatient ? 'you@example.com' : 'doctor@healthai.com',
+                prefixIcon: isPatient ? Icons.email_outlined : Icons.badge_outlined,
+                keyboardType: TextInputType.emailAddress,
+                focusColor: const Color(0xFF2563EB),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Password',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF334155),
+                ),
+              ),
+              const SizedBox(height: 8),
+              CustomTextField(
+                controller: controller.passwordController,
+                hintText: 'Enter your password',
+                prefixIcon: Icons.lock_outline_rounded,
+                isPassword: true,
+                focusColor: const Color(0xFF2563EB),
+              ),
+            ],
+          );
+        }),
 
         const SizedBox(height: 10),
 
@@ -515,7 +487,7 @@ class _LogInPageState extends State<LogInPage> {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: () {},
+            onPressed: () => controller.resetPassword(),
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
               minimumSize: Size.zero,
@@ -534,28 +506,40 @@ class _LogInPageState extends State<LogInPage> {
         const SizedBox(height: 20),
 
         // Log In Submit Button
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2563EB),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+        Obx(() {
+          final bool isLoading = controller.isLoading.value;
+          return SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : () => controller.loginUser(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2563EB),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+              child: isLoading
+                  ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Log In',
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
-            child: Text(
-              'Log In',
-              style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
+          );
+        }),
         const SizedBox(height: 24),
 
         // Social Login Buttons
@@ -577,7 +561,9 @@ class _LogInPageState extends State<LogInPage> {
               ),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Get.to(() => const SignUpPage());
+              },
               child: Text(
                 'Sign Up',
                 style: GoogleFonts.poppins(
