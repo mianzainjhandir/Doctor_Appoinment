@@ -19,3 +19,5 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// Now my next step is to connect my project with firebase.
+
