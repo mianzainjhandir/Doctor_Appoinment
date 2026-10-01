@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:webdocappoinment/views/home/view.dart';
+import 'package:webdocappoinment/views/doctor_views/home/view.dart';
+import 'package:webdocappoinment/views/patient_view/home/view.dart';
 
 class SignUpController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -147,8 +148,12 @@ class SignUpController extends GetxController {
         colorText: Colors.white,
       );
 
-      // Navigate to Home Page
-      Get.offAll(() => const HomeScreen());
+      // Navigate based on Role
+      if (isPatientSelected.value) {
+        Get.offAll(() => const PatientHomeView());
+      } else {
+        Get.offAll(() => const DocHomeView());
+      }
     } on FirebaseAuthException catch (e) {
       isLoading.value = false;
       String message = "Sign up failed. Please try again.";
