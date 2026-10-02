@@ -16,6 +16,19 @@ class AddDoctorView extends StatefulWidget {
 class _AddDoctorViewState extends State<AddDoctorView> {
   int currentStep = 1;
 
+  // Form Controllers
+  final fullNameCtrl = TextEditingController();
+  final emailCtrl = TextEditingController();
+  final phoneCtrl = TextEditingController();
+  final dobCtrl = TextEditingController();
+  final expCtrl = TextEditingController();
+  String? selectedGender;
+
+  String? selectedSpecialization;
+  final qualificationCtrl = TextEditingController();
+  final licenseCtrl = TextEditingController();
+  final aboutCtrl = TextEditingController();
+
   // Step Data
   Map<String, dynamic> step1Data = {};
   Map<String, dynamic> step1And2Data = {};
