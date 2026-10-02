@@ -1,9 +1,8 @@
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../home/view.dart';
+import '../../../widget/doctor_sidebar.dart';
+import '../add_doctor/view.dart';
+import '../doctors_list/view.dart';
 
 class DocHomeView extends StatefulWidget {
   const DocHomeView({super.key});
@@ -13,16 +12,16 @@ class DocHomeView extends StatefulWidget {
 }
 
 class _DocHomeViewState extends State<DocHomeView> {
-  int selectedIndex = 0;
+  int selectedIndex = 1; // "Doctors" active tab by default
 
   final List<String> menuTitles = [
     'Dashboard',
-    'My Profile',
+    'Doctors',
+    'Add Doctor',
     'Appointments',
     'Patients',
     'Documents',
-    'Availability',
-    'Chat',
+    'Messages',
     'Settings',
   ];
 
@@ -37,14 +36,21 @@ class _DocHomeViewState extends State<DocHomeView> {
           if (isWeb) {
             return Row(
               children: [
-                // Persistent Doctor Sidebar on Web/Desktop
-                _buildDoctorSidebar(context),
+                // Custom Doctor Sidebar Widget
+                DoctorSidebar(
+                  selectedIndex: selectedIndex,
+                  onItemSelected: (index) {
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                  },
+                ),
 
-                // Main Content Area
+                // Main Content Body
                 Expanded(
                   child: Column(
                     children: [
-                      // Top Header Bar
+                      // Top Navigation Bar
                       Container(
                         height: 70,
                         padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -79,7 +85,7 @@ class _DocHomeViewState extends State<DocHomeView> {
 
                       // Main Page Content
                       Expanded(
-                        child: _buildMainContent(),
+                        child: _buildMainContentArea(),
                       ),
                     ],
                   ),
@@ -104,9 +110,17 @@ class _DocHomeViewState extends State<DocHomeView> {
                 ),
               ),
               drawer: Drawer(
-                child: _buildDoctorSidebar(context),
+                child: DoctorSidebar(
+                  selectedIndex: selectedIndex,
+                  onItemSelected: (index) {
+                    Navigator.pop(context); // Close drawer
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                  },
+                ),
               ),
-              body: _buildMainContent(),
+              body: _buildMainContentArea(),
             );
           }
         },
@@ -114,296 +128,55 @@ class _DocHomeViewState extends State<DocHomeView> {
     );
   }
 
-  // ================= MAIN CONTENT PLACEHOLDER =================
-  Widget _buildMainContent() {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
+  // ================= MAIN CONTENT SWITCHER =================
+  Widget _buildMainContentArea() {
+    switch (selectedIndex) {
+      case 1:
+        // Doctors Directory List
+        return DoctorsListView(
+          onAddDoctorPressed: () {
+            setState(() {
+              selectedIndex = 2; // Switch to Add Doctor view
+            });
+          },
+        );
+
+      case 2:
+        // Add Doctor Form View
+        return AddDoctorView(
+          onSuccess: () {
+            setState(() {
+              selectedIndex = 1; // Return to Doctors list after successful save
+            });
+          },
+        );
+
+      default:
+        // Default Placeholder View for other menu tabs
+        return Padding(
+          padding: const EdgeInsets.all(24),
           child: Center(
-            child: Text(
-              '${menuTitles[selectedIndex]} Content Area',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF64748B),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ================= DOCTOR SIDEBAR =================
-  Widget _buildDoctorSidebar(BuildContext context) {
-    final User? currentUser = FirebaseAuth.instance.currentUser;
-
-    return Container(
-      width: 270,
-      height: double.infinity,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          right: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-        ),
-      ),
-      child: Column(
-        children: [
-          // 1. Logo Header
-          Padding(
-            padding:
-                const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 20),
-            child: Row(
-              children: [
-                Image.asset(
-                  'assets/images/img.png',
-                  height: 38,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.favorite_rounded,
-                      color: Color(0xFF2563EB),
-                      size: 32,
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Health',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF1E1B4B),
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'AI',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF2563EB),
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // 2. Doctor Profile Card
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
             child: Container(
-              padding: const EdgeInsets.all(12),
+              width: double.infinity,
+              height: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 22,
-                    backgroundColor: const Color(0xFFDBEAFE),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/img_7.png',
-                        width: 44,
-                        height: 44,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(
-                            Icons.person_rounded,
-                            color: Color(0xFF2563EB),
-                            size: 26,
-                          );
-                        },
-                      ),
-                    ),
+              child: Center(
+                child: Text(
+                  '${menuTitles[selectedIndex]} Content Area',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF64748B),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          currentUser?.displayName ?? 'Dr. Ahmed Khan',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1E1B4B),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Cardiologist',
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: const Color(0xFF64748B),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // 3. Navigation Menu Items
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                _buildMenuItem(
-                  icon: Icons.home_rounded,
-                  title: 'Dashboard',
-                  index: 0,
-                ),
-                _buildMenuItem(
-                  icon: Icons.person_outline_rounded,
-                  title: 'My Profile',
-                  index: 1,
-                ),
-                _buildMenuItem(
-                  icon: Icons.event_note_rounded,
-                  title: 'Appointments',
-                  index: 2,
-                ),
-                _buildMenuItem(
-                  icon: Icons.people_outline_rounded,
-                  title: 'Patients',
-                  index: 3,
-                ),
-                _buildMenuItem(
-                  icon: Icons.description_outlined,
-                  title: 'Documents',
-                  index: 4,
-                ),
-                _buildMenuItem(
-                  icon: Icons.access_time_rounded,
-                  title: 'Availability',
-                  index: 5,
-                ),
-                _buildMenuItem(
-                  icon: Icons.chat_bubble_outline_rounded,
-                  title: 'Chat',
-                  index: 6,
-                ),
-                _buildMenuItem(
-                  icon: Icons.settings_outlined,
-                  title: 'Settings',
-                  index: 7,
-                ),
-              ],
-            ),
-          ),
-
-          // 4. Logout Item
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: InkWell(
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                Get.offAll(() => const HomeScreen());
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.logout_rounded,
-                      color: Color(0xFF2563EB),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 14),
-                    Text(
-                      'Logout',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF2563EB),
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  // ================= MENU ITEM =================
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    required int index,
-  }) {
-    final bool isSelected = selectedIndex == index;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: InkWell(
-        onTap: () {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: isSelected
-                    ? const Color(0xFF2563EB)
-                    : const Color(0xFF64748B),
-                size: 20,
-              ),
-              const SizedBox(width: 14),
-              Text(
-                title,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected
-                      ? const Color(0xFF2563EB)
-                      : const Color(0xFF475569),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+        );
+    }
   }
 }
-
