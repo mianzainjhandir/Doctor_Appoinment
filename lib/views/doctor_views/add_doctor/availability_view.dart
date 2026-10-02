@@ -6,13 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 class AddDoctorAvailabilityView extends StatefulWidget {
   final Map<String, dynamic> doctorDataStep1;
   final VoidCallback onBack;
-  final VoidCallback onSuccess;
+  final Function(Map<String, dynamic>) onNext;
 
   const AddDoctorAvailabilityView({
     super.key,
     required this.doctorDataStep1,
     required this.onBack,
-    required this.onSuccess,
+    required this.onNext,
   });
 
   @override
@@ -85,7 +85,7 @@ class _AddDoctorAvailabilityViewState
     }
   }
 
-  Future<void> _saveCompleteDoctor() async {
+  void _goToNextStep3() {
     if (feeCtrl.text.trim().isEmpty) {
       Get.snackbar(
         'Required',
@@ -97,54 +97,17 @@ class _AddDoctorAvailabilityViewState
       return;
     }
 
-    setState(() {
-      isSaving = true;
-    });
+    final Map<String, dynamic> step1And2Data = {
+      ...widget.doctorDataStep1,
+      'fee': feeCtrl.text.trim(),
+      'followUpFee': followUpFeeCtrl.text.trim(),
+      'availableDays': selectedDays.toList(),
+      'startTime': startTimeCtrl.text.trim(),
+      'endTime': endTimeCtrl.text.trim(),
+      'breakTime': breakTimeCtrl.text.trim(),
+    };
 
-    try {
-      // Combine Step 1 data with Step 2 (Fee & Availability)
-      final Map<String, dynamic> fullDoctorData = {
-        ...widget.doctorDataStep1,
-        'fee': feeCtrl.text.trim(),
-        'followUpFee': followUpFeeCtrl.text.trim(),
-        'availableDays': selectedDays.toList(),
-        'startTime': startTimeCtrl.text.trim(),
-        'endTime': endTimeCtrl.text.trim(),
-        'breakTime': breakTimeCtrl.text.trim(),
-        'role': 'doctor',
-        'createdAt': FieldValue.serverTimestamp(),
-      };
-
-      // Save to Firestore "doctor" collection
-      await FirebaseFirestore.instance
-          .collection('doctor')
-          .add(fullDoctorData);
-
-      setState(() {
-        isSaving = false;
-      });
-
-      Get.snackbar(
-        'Success',
-        'Doctor added successfully with availability schedule!',
-        backgroundColor: Colors.green.shade600,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
-      widget.onSuccess();
-    } catch (e) {
-      setState(() {
-        isSaving = false;
-      });
-      Get.snackbar(
-        'Error',
-        'Failed to save doctor: $e',
-        backgroundColor: Colors.red.shade400,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
+    widget.onNext(step1And2Data);
   }
 
   @override
@@ -384,9 +347,9 @@ class _AddDoctorAvailabilityViewState
               ),
               const SizedBox(width: 14),
 
-              // Save / Next Button
+              // Next Button
               ElevatedButton(
-                onPressed: isSaving ? null : _saveCompleteDoctor,
+                onPressed: _goToNextStep3,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2563EB),
                   foregroundColor: Colors.white,
@@ -397,29 +360,20 @@ class _AddDoctorAvailabilityViewState
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: isSaving
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Save Doctor',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Icon(Icons.arrow_forward_rounded, size: 18),
-                        ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Next',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                       ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.arrow_forward_rounded, size: 18),
+                  ],
+                ),
               ),
             ],
           ),

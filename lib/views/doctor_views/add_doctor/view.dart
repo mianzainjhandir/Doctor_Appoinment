@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'availability_view.dart';
+import 'documents_view.dart';
 
 class AddDoctorView extends StatefulWidget {
   final VoidCallback? onSuccess;
@@ -15,20 +16,9 @@ class AddDoctorView extends StatefulWidget {
 class _AddDoctorViewState extends State<AddDoctorView> {
   int currentStep = 1;
 
-  // Step 1 Data Controllers
-  final fullNameCtrl = TextEditingController();
-  final emailCtrl = TextEditingController();
-  final phoneCtrl = TextEditingController();
-  final dobCtrl = TextEditingController();
-  final expCtrl = TextEditingController();
-  String? selectedGender;
-
-  String? selectedSpecialization;
-  final qualificationCtrl = TextEditingController();
-  final licenseCtrl = TextEditingController();
-  final aboutCtrl = TextEditingController();
-
+  // Step Data
   Map<String, dynamic> step1Data = {};
+  Map<String, dynamic> step1And2Data = {};
 
   final List<String> genderOptions = ['Male', 'Female', 'Other'];
   final List<String> specializationOptions = [
@@ -120,6 +110,23 @@ class _AddDoctorViewState extends State<AddDoctorView> {
         onBack: () {
           setState(() {
             currentStep = 1;
+          });
+        },
+        onNext: (data) {
+          setState(() {
+            step1And2Data = data;
+            currentStep = 3;
+          });
+        },
+      );
+    }
+
+    if (currentStep == 3) {
+      return AddDoctorDocumentsView(
+        doctorDataStep1And2: step1And2Data,
+        onBack: () {
+          setState(() {
+            currentStep = 2;
           });
         },
         onSuccess: () {
