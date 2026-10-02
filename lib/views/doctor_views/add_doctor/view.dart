@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'availability_view.dart';
 
 class AddDoctorView extends StatefulWidget {
   final VoidCallback? onSuccess;
@@ -13,7 +13,9 @@ class AddDoctorView extends StatefulWidget {
 }
 
 class _AddDoctorViewState extends State<AddDoctorView> {
-  // Personal Info Controllers
+  int currentStep = 1;
+
+  // Step 1 Data Controllers
   final fullNameCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
@@ -21,13 +23,12 @@ class _AddDoctorViewState extends State<AddDoctorView> {
   final expCtrl = TextEditingController();
   String? selectedGender;
 
-  // Professional Info Controllers
   String? selectedSpecialization;
   final qualificationCtrl = TextEditingController();
   final licenseCtrl = TextEditingController();
   final aboutCtrl = TextEditingController();
 
-  bool isSaving = false;
+  Map<String, dynamic> step1Data = {};
 
   final List<String> genderOptions = ['Male', 'Female', 'Other'];
   final List<String> specializationOptions = [
@@ -81,7 +82,7 @@ class _AddDoctorViewState extends State<AddDoctorView> {
     }
   }
 
-  Future<void> _saveDoctor() async {
+  void _goToNextStep() {
     if (fullNameCtrl.text.trim().isEmpty) {
       Get.snackbar('Required', 'Please enter Full Name',
           backgroundColor: Colors.red.shade400, colorText: Colors.white);
@@ -93,57 +94,42 @@ class _AddDoctorViewState extends State<AddDoctorView> {
       return;
     }
 
+    step1Data = {
+      'fullName': fullNameCtrl.text.trim(),
+      'email': emailCtrl.text.trim(),
+      'phone': phoneCtrl.text.trim(),
+      'gender': selectedGender ?? 'Male',
+      'dob': dobCtrl.text.trim(),
+      'experience': expCtrl.text.trim(),
+      'specialty': selectedSpecialization ?? 'General Physician',
+      'qualification': qualificationCtrl.text.trim(),
+      'licenseNumber': licenseCtrl.text.trim(),
+      'about': aboutCtrl.text.trim(),
+    };
+
     setState(() {
-      isSaving = true;
+      currentStep = 2;
     });
-
-    try {
-      await FirebaseFirestore.instance.collection('doctor').add({
-        'fullName': fullNameCtrl.text.trim(),
-        'email': emailCtrl.text.trim(),
-        'phone': phoneCtrl.text.trim(),
-        'gender': selectedGender ?? 'Male',
-        'dob': dobCtrl.text.trim(),
-        'experience': expCtrl.text.trim(),
-        'specialty': selectedSpecialization ?? 'General Physician',
-        'qualification': qualificationCtrl.text.trim(),
-        'licenseNumber': licenseCtrl.text.trim(),
-        'about': aboutCtrl.text.trim(),
-        'role': 'doctor',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
-      setState(() {
-        isSaving = false;
-      });
-
-      Get.snackbar(
-        'Success',
-        'Doctor added successfully!',
-        backgroundColor: Colors.green.shade600,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
-      if (widget.onSuccess != null) {
-        widget.onSuccess!();
-      }
-    } catch (e) {
-      setState(() {
-        isSaving = false;
-      });
-      Get.snackbar(
-        'Error',
-        'Failed to add doctor: $e',
-        backgroundColor: Colors.red.shade400,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (currentStep == 2) {
+      return AddDoctorAvailabilityView(
+        doctorDataStep1: step1Data,
+        onBack: () {
+          setState(() {
+            currentStep = 1;
+          });
+        },
+        onSuccess: () {
+          if (widget.onSuccess != null) {
+            widget.onSuccess!();
+          }
+        },
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(28),
       child: Column(
@@ -365,9 +351,9 @@ class _AddDoctorViewState extends State<AddDoctorView> {
                     ),
                     const SizedBox(width: 14),
 
-                    // Next / Save Button
+                    // Next Button
                     ElevatedButton(
-                      onPressed: isSaving ? null : _saveDoctor,
+                      onPressed: _goToNextStep,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2563EB),
                         foregroundColor: Colors.white,
@@ -378,30 +364,20 @@ class _AddDoctorViewState extends State<AddDoctorView> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: isSaving
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Next',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                const Icon(Icons.arrow_forward_rounded,
-                                    size: 18),
-                              ],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Next',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
                             ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.arrow_forward_rounded, size: 18),
+                        ],
+                      ),
                     ),
                   ],
                 ),
