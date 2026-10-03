@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 
 class AddDoctorDocumentsView extends StatefulWidget {
   final Map<String, dynamic> doctorDataStep1And2;
@@ -25,7 +25,7 @@ class AddDoctorDocumentsView extends StatefulWidget {
 class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
   final descriptionCtrl = TextEditingController();
 
-  XFile? _selectedImageFile;
+  PlatformFile? _selectedImageFile;
   Uint8List? _selectedImageBytes;
 
   final List<String> allSpecialties = [
@@ -45,28 +45,31 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
 
   Future<void> _pickProfileImage() async {
     try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true,
       );
 
-      if (image != null) {
-        final Uint8List bytes = await image.readAsBytes();
-        setState(() {
-          _selectedImageFile = image;
-          _selectedImageBytes = bytes;
-        });
-        Get.snackbar(
-          'Photo Selected',
-          'Profile image selected successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.blue.shade100,
-        );
+      if (result != null && result.files.isNotEmpty) {
+        final PlatformFile file = result.files.first;
+        final Uint8List? bytes = file.bytes;
+
+        if (bytes != null) {
+          setState(() {
+            _selectedImageFile = file;
+            _selectedImageBytes = bytes;
+          });
+          Get.snackbar(
+            'Photo Selected',
+            'Profile image (${file.name}) selected successfully!',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.blue.shade100,
+          );
+        }
       }
     } catch (e) {
       Get.snackbar(
-        'Picker Error',
+        'Picker Notice',
         'Could not pick image: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade400,
