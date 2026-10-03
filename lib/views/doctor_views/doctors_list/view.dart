@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -131,6 +133,35 @@ class DoctorsListView extends StatelessWidget {
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
                     final data = docs[index].data() as Map<String, dynamic>;
+                    final String? profileImgBase64 = data['profileImage'];
+
+                    Widget avatarWidget;
+                    if (profileImgBase64 != null &&
+                        profileImgBase64.isNotEmpty &&
+                        profileImgBase64.contains('base64,')) {
+                      try {
+                        final String cleanBase64 = profileImgBase64.split('base64,').last;
+                        final Uint8List bytes = base64Decode(cleanBase64);
+                        avatarWidget = Image.memory(
+                          bytes,
+                          width: 52,
+                          height: 52,
+                          fit: BoxFit.cover,
+                        );
+                      } catch (e) {
+                        avatarWidget = const Icon(
+                          Icons.person_rounded,
+                          color: Color(0xFF2563EB),
+                          size: 28,
+                        );
+                      }
+                    } else {
+                      avatarWidget = const Icon(
+                        Icons.person_rounded,
+                        color: Color(0xFF2563EB),
+                        size: 28,
+                      );
+                    }
 
                     return Container(
                       padding: const EdgeInsets.all(20),
@@ -155,19 +186,7 @@ class DoctorsListView extends StatelessWidget {
                                 radius: 26,
                                 backgroundColor: const Color(0xFFDBEAFE),
                                 child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/images/img_1.png',
-                                    width: 52,
-                                    height: 52,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(
-                                        Icons.person_rounded,
-                                        color: Color(0xFF2563EB),
-                                        size: 28,
-                                      );
-                                    },
-                                  ),
+                                  child: avatarWidget,
                                 ),
                               ),
                               const SizedBox(width: 14),

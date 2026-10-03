@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -98,9 +99,17 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
     });
 
     try {
+      // Base64 image string for storing directly in Firestore
+      String profileImageBase64 = '';
+      if (_selectedImageBytes != null) {
+        profileImageBase64 =
+            'data:image/png;base64,${base64Encode(_selectedImageBytes!)}';
+      }
+
       // Combine Step 1, Step 2, and Step 3 data
       final Map<String, dynamic> completeDoctorData = {
         ...widget.doctorDataStep1And2,
+        'profileImage': profileImageBase64,
         'shortDescription': descriptionCtrl.text.trim(),
         'selectedSpecialties': selectedSpecialties.toList(),
         'degreeUploaded': isDegreeUploaded,
