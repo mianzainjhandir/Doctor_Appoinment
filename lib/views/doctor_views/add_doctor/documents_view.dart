@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddDoctorDocumentsView extends StatefulWidget {
   final Map<String, dynamic> doctorDataStep1And2;
@@ -22,6 +24,9 @@ class AddDoctorDocumentsView extends StatefulWidget {
 class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
   final descriptionCtrl = TextEditingController();
 
+  XFile? _selectedImageFile;
+  Uint8List? _selectedImageBytes;
+
   final List<String> allSpecialties = [
     'Cardiology',
     'Heart Surgery',
@@ -36,6 +41,38 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
   bool isDegreeUploaded = false;
   bool isExperienceUploaded = false;
   bool isSaving = false;
+
+  Future<void> _pickProfileImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        final Uint8List bytes = await image.readAsBytes();
+        setState(() {
+          _selectedImageFile = image;
+          _selectedImageBytes = bytes;
+        });
+        Get.snackbar(
+          'Photo Selected',
+          'Profile image selected successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.blue.shade100,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Picker Error',
+        'Could not pick image: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -156,10 +193,19 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
                     CircleAvatar(
                       radius: 36,
                       backgroundColor: const Color(0xFFDBEAFE),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        size: 42,
-                        color: Color(0xFF94A3B8),
+                      child: ClipOval(
+                        child: _selectedImageBytes != null
+                            ? Image.memory(
+                                _selectedImageBytes!,
+                                width: 72,
+                                height: 72,
+                                fit: BoxFit.cover,
+                              )
+                            : const Icon(
+                                Icons.person_rounded,
+                                size: 42,
+                                color: Color(0xFF94A3B8),
+                              ),
                       ),
                     ),
                     const SizedBox(width: 20),
@@ -167,14 +213,7 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         OutlinedButton(
-                          onPressed: () {
-                            Get.snackbar(
-                              'Photo Upload',
-                              'Photo selected',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.blue.shade100,
-                            );
-                          },
+                          onPressed: _pickProfileImage,
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF2563EB),
                             side: const BorderSide(color: Color(0xFFBFDBFE)),
@@ -185,7 +224,7 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
                                 horizontal: 20, vertical: 10),
                           ),
                           child: Text(
-                            'Upload Photo',
+                            _selectedImageFile != null ? 'Change Photo' : 'Upload Photo',
                             style: GoogleFonts.poppins(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,

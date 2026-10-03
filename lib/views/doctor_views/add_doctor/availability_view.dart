@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -58,31 +57,23 @@ class _AddDoctorAvailabilityViewState
     });
   }
 
-  Future<void> _selectTime(
-      BuildContext context, TextEditingController controller) async {
-    final TimeOfDay? picked = await showTimePicker(
+  void _selectTime(
+      BuildContext context, TextEditingController controller) {
+    showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 9, minute: 0),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF2563EB),
-              onPrimary: Colors.white,
-              onSurface: Color(0xFF0F172A),
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
+    ).then((TimeOfDay? picked) {
+      if (picked != null) {
+        final int h = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
+        final int m = picked.minute;
+        final String ampm = picked.hour >= 12 ? 'PM' : 'AM';
 
-    if (picked != null) {
-      final formattedTime = picked.format(context);
-      setState(() {
-        controller.text = formattedTime;
-      });
-    }
+        setState(() {
+          controller.text =
+              "${h < 10 ? '0$h' : '$h'}:${m < 10 ? '0$m' : '$m'} $ampm";
+        });
+      }
+    });
   }
 
   void _goToNextStep3() {
