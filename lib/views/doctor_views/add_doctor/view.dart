@@ -575,12 +575,6 @@ class _AddDoctorViewState extends State<AddDoctorView> {
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          value: value,
-          onChanged: onChanged,
-          icon: const Icon(Icons.keyboard_arrow_down,
-              color: Color(0xFF64748B), size: 20),
-          style: GoogleFonts.poppins(
-              fontSize: 13.5, color: const Color(0xFF0F172A)),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.poppins(
@@ -603,12 +597,17 @@ class _AddDoctorViewState extends State<AddDoctorView> {
                   const BorderSide(color: Color(0xFF2563EB), width: 1.5),
             ),
           ),
+          icon: const Icon(Icons.keyboard_arrow_down,
+              color: Color(0xFF64748B), size: 20),
+          style: GoogleFonts.poppins(
+              fontSize: 13.5, color: const Color(0xFF0F172A)),
           items: items.map((item) {
             return DropdownMenuItem<String>(
               value: item,
               child: Text(item, style: GoogleFonts.poppins(fontSize: 13.5)),
             );
           }).toList(),
+          onChanged: onChanged,
         ),
       ],
     );

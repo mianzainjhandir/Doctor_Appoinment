@@ -144,7 +144,7 @@ class _DoctorsListViewState extends State<DoctorsListView> {
                       _buildDialogInput('Consultation Fee (PKR)', feeEditCtrl),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
-                        value: currentStatus,
+                        initialValue: currentStatus,
                         items: ['Active', 'Inactive'].map((s) {
                           return DropdownMenuItem(value: s, child: Text(s));
                         }).toList(),
@@ -368,7 +368,7 @@ class _DoctorsListViewState extends State<DoctorsListView> {
                   backgroundColor: const Color(0xFF2563EB),
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  height: 44,
+                  minimumSize: const Size(0, 44),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(
