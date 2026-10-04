@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddDoctorDocumentsView extends StatefulWidget {
   final Map<String, dynamic> doctorDataStep1And2;
@@ -45,6 +46,33 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
 
   Future<void> _pickProfileImage() async {
     try {
+      // 1. First try ImagePicker with native resizing & compression
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 250,
+        maxHeight: 250,
+        imageQuality: 60, // Compress quality so size remains ~20KB
+      );
+
+      if (image != null) {
+        final Uint8List bytes = await image.readAsBytes();
+        setState(() {
+          _selectedImageBytes = bytes;
+        });
+        Get.snackbar(
+          'Photo Selected',
+          'Profile image compressed & selected successfully!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.blue.shade100,
+        );
+        return;
+      }
+    } catch (_) {
+      // Fallback to FilePicker if ImagePicker fails on web/desktop channel
+    }
+
+    try {
       final FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.image,
         withData: true,
@@ -56,12 +84,11 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
 
         if (bytes != null) {
           setState(() {
-            _selectedImageFile = file;
             _selectedImageBytes = bytes;
           });
           Get.snackbar(
             'Photo Selected',
-            'Profile image (${file.name}) selected successfully!',
+            'Profile image selected successfully!',
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.blue.shade100,
           );
@@ -69,7 +96,7 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
       }
     } catch (e) {
       Get.snackbar(
-        'Picker Notice',
+        'Picker Error',
         'Could not pick image: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade400,
@@ -105,8 +132,25 @@ class _AddDoctorDocumentsViewState extends State<AddDoctorDocumentsView> {
       // Base64 image string for storing directly in Firestore
       String profileImageBase64 = '';
       if (_selectedImageBytes != null) {
-        profileImageBase64 =
-            'data:image/png;base64,${base64Encode(_selectedImageBytes!)}';
+        String encoded = base64Encode(_selectedImageBytes!);
+
+        // Safety check for Firestore 1MB document limit
+        if (encoded.length > 800000) {
+          Get.snackbar(
+            'Image Too Large',
+            'Selected image size is too large for database. Please select a smaller photo or PNG under 500KB.',
+            backgroundColor: Colors.orange.shade800,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 4),
+          );
+          setState(() {
+            isSaving = false;
+          });
+          return;
+        }
+
+        profileImageBase64 = 'data:image/png;base64,$encoded';
       }
 
       // Combine Step 1, Step 2, and Step 3 data
