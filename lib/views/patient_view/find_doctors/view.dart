@@ -64,89 +64,11 @@ class _FindDoctorsViewState extends State<FindDoctorsView> {
 
   @override
   Widget build(BuildContext context) {
-    final User? currentUser = FirebaseAuth.instance.currentUser;
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Navigation Bar (HealthAI logo, links, patient profile)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Row(
-              children: [
-                // Logo
-                Image.asset(
-                  'assets/images/img.png',
-                  height: 36,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.favorite_rounded,
-                    color: Color(0xFF2563EB),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Health',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF1E1B4B),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'AI',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF2563EB),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 40),
-
-                // Center Links
-                _buildTopNavLink('Home', false),
-                const SizedBox(width: 20),
-                _buildTopNavLink('Doctors', true),
-                const SizedBox(width: 20),
-                _buildTopNavLink('Documents', false),
-                const SizedBox(width: 20),
-                _buildTopNavLink('Chat', false),
-
-                const Spacer(),
-
-                // Patient User Profile
-                CircleAvatar(
-                  radius: 18,
-                  backgroundColor: const Color(0xFFDBEAFE),
-                  child: const Icon(Icons.person_rounded,
-                      color: Color(0xFF2563EB), size: 22),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  currentUser?.displayName ?? 'Patient User',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF0F172A),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
           // Main Layout: Left Filters + Right Doctors List
           LayoutBuilder(
             builder: (context, constraints) {

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widget/patient_sidebar.dart';
@@ -50,38 +51,8 @@ class _PatientHomeViewState extends State<PatientHomeView> {
                 Expanded(
                   child: Column(
                     children: [
-                      // Top Header Bar
-                      Container(
-                        height: 70,
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          border: Border(
-                            bottom: BorderSide(
-                                color: Color(0xFFE2E8F0), width: 1),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              menuTitles[selectedIndex],
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF0F172A),
-                              ),
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.notifications_none_rounded,
-                                color: Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Top Card Navigation Bar
+                      _buildTopNavBar(context),
 
                       // Main Page Content
                       Expanded(
@@ -124,6 +95,120 @@ class _PatientHomeViewState extends State<PatientHomeView> {
             );
           }
         },
+      ),
+    );
+  }
+
+  // ================= TOP CARD NAV BAR =================
+  Widget _buildTopNavBar(BuildContext context) {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 20, bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x06000000),
+              blurRadius: 10,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Logo
+            Image.asset(
+              'assets/images/img.png',
+              height: 36,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.favorite_rounded,
+                color: Color(0xFF2563EB),
+                size: 30,
+              ),
+            ),
+            const SizedBox(width: 8),
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Health',
+                    style: GoogleFonts.poppins(
+                      color: const Color(0xFF1E1B4B),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'AI',
+                    style: GoogleFonts.poppins(
+                      color: const Color(0xFF2563EB),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 40),
+
+            // Center Nav Links
+            _buildTopNavLink('Home', 0),
+            const SizedBox(width: 24),
+            _buildTopNavLink('Doctors', 1),
+            const SizedBox(width: 24),
+            _buildTopNavLink('Documents', 3),
+            const SizedBox(width: 24),
+            _buildTopNavLink('Chat', 4),
+
+            const Spacer(),
+
+            // Patient User Profile
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: const Color(0xFFDBEAFE),
+              child: const Icon(Icons.person_rounded,
+                  color: Color(0xFF2563EB), size: 22),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              currentUser?.displayName ?? 'Aslam',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF0F172A),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopNavLink(String label, int index) {
+    final bool isSelected = selectedIndex == index;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          selectedIndex = index;
+        });
+      },
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF64748B),
+          ),
+        ),
       ),
     );
   }
