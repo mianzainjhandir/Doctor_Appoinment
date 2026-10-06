@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FindDoctorsView extends StatefulWidget {
@@ -113,17 +111,6 @@ class _FindDoctorsViewState extends State<FindDoctorsView> {
     );
   }
 
-  Widget _buildTopNavLink(String label, bool isSelected) {
-    return Text(
-      label,
-      style: GoogleFonts.poppins(
-        fontSize: 13.5,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-        color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF64748B),
-      ),
-    );
-  }
-
   // ================= LEFT FILTERS SIDEBAR CARD =================
   Widget _buildFiltersCard() {
     return Container(
@@ -180,7 +167,7 @@ class _FindDoctorsViewState extends State<FindDoctorsView> {
           ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: selectedSpecialization,
+            initialValue: selectedSpecialization,
             isExpanded: true,
             icon: const Icon(Icons.keyboard_arrow_down,
                 color: Color(0xFF64748B), size: 18),
@@ -211,7 +198,7 @@ class _FindDoctorsViewState extends State<FindDoctorsView> {
           ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: selectedLocation,
+            initialValue: selectedLocation,
             isExpanded: true,
             icon: const Icon(Icons.keyboard_arrow_down,
                 color: Color(0xFF64748B), size: 18),
@@ -730,6 +717,7 @@ class _FindDoctorsViewState extends State<FindDoctorsView> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
