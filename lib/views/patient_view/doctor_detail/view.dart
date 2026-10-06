@@ -7,11 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 class DoctorDetailView extends StatefulWidget {
   final Map<String, dynamic> doctorData;
   final VoidCallback onBack;
+  final VoidCallback? onBookAppointment;
 
   const DoctorDetailView({
     super.key,
     required this.doctorData,
     required this.onBack,
+    this.onBookAppointment,
   });
 
   @override
