@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widget/patient_sidebar.dart';
+import '../doctor_detail/view.dart';
 import '../find_doctors/view.dart';
 
 class PatientHomeView extends StatefulWidget {
@@ -13,6 +14,7 @@ class PatientHomeView extends StatefulWidget {
 
 class _PatientHomeViewState extends State<PatientHomeView> {
   int selectedIndex = 0; // Dashboard active by default
+  Map<String, dynamic>? selectedDoctorData;
 
   final List<String> menuTitles = [
     'Dashboard',
@@ -43,6 +45,7 @@ class _PatientHomeViewState extends State<PatientHomeView> {
                   onItemSelected: (index) {
                     setState(() {
                       selectedIndex = index;
+                      selectedDoctorData = null;
                     });
                   },
                 ),
@@ -191,11 +194,12 @@ class _PatientHomeViewState extends State<PatientHomeView> {
   }
 
   Widget _buildTopNavLink(String label, int index) {
-    final bool isSelected = selectedIndex == index;
+    final bool isSelected = selectedIndex == index && selectedDoctorData == null;
     return InkWell(
       onTap: () {
         setState(() {
           selectedIndex = index;
+          selectedDoctorData = null;
         });
       },
       borderRadius: BorderRadius.circular(6),
@@ -215,9 +219,26 @@ class _PatientHomeViewState extends State<PatientHomeView> {
 
   // ================= MAIN CONTENT PLACEHOLDER =================
   Widget _buildMainContentArea() {
+    if (selectedDoctorData != null) {
+      return DoctorDetailView(
+        doctorData: selectedDoctorData!,
+        onBack: () {
+          setState(() {
+            selectedDoctorData = null;
+          });
+        },
+      );
+    }
+
     if (selectedIndex == 1) {
       // Find Doctors View
-      return const FindDoctorsView();
+      return FindDoctorsView(
+        onDoctorSelected: (docData) {
+          setState(() {
+            selectedDoctorData = docData;
+          });
+        },
+      );
     }
 
     return Padding(

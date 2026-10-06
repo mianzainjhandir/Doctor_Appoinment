@@ -7,7 +7,12 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FindDoctorsView extends StatefulWidget {
-  const FindDoctorsView({super.key});
+  final Function(Map<String, dynamic>)? onDoctorSelected;
+
+  const FindDoctorsView({
+    super.key,
+    this.onDoctorSelected,
+  });
 
   @override
   State<FindDoctorsView> createState() => _FindDoctorsViewState();
@@ -567,29 +572,36 @@ class _FindDoctorsViewState extends State<FindDoctorsView> {
           size: 44, color: Color(0xFF2563EB));
     }
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x06000000),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Doctor Avatar
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: const Color(0xFFDBEAFE),
-            child: ClipOval(child: avatarWidget),
-          ),
+    return InkWell(
+      onTap: () {
+        if (widget.onDoctorSelected != null) {
+          widget.onDoctorSelected!(data);
+        }
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x06000000),
+              blurRadius: 10,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Doctor Avatar
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: const Color(0xFFDBEAFE),
+              child: ClipOval(child: avatarWidget),
+            ),
           const SizedBox(width: 20),
 
           // Doctor Info
@@ -692,12 +704,9 @@ class _FindDoctorsViewState extends State<FindDoctorsView> {
               // Book Appointment Button
               ElevatedButton(
                 onPressed: () {
-                  Get.snackbar(
-                    'Booking',
-                    'Opening appointment booking for $name...',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Colors.blue.shade100,
-                  );
+                  if (widget.onDoctorSelected != null) {
+                    widget.onDoctorSelected!(data);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2563EB),
