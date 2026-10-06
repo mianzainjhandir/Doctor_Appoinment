@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widget/patient_sidebar.dart';
+import '../find_doctors/view.dart';
 
 class PatientHomeView extends StatefulWidget {
   const PatientHomeView({super.key});
@@ -129,6 +130,11 @@ class _PatientHomeViewState extends State<PatientHomeView> {
 
   // ================= MAIN CONTENT PLACEHOLDER =================
   Widget _buildMainContentArea() {
+    if (selectedIndex == 1) {
+      // Find Doctors View
+      return const FindDoctorsView();
+    }
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Center(
