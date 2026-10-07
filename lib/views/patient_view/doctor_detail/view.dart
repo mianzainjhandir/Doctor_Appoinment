@@ -382,12 +382,9 @@ class _DoctorDetailViewState extends State<DoctorDetailView> {
                       height: 46,
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.snackbar(
-                            'Booking',
-                            'Opening appointment schedule for $name...',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.blue.shade100,
-                          );
+                          if (widget.onBookAppointment != null) {
+                            widget.onBookAppointment!();
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2563EB),

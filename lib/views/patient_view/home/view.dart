@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widget/patient_sidebar.dart';
+import '../book_appointment/view.dart';
 import '../doctor_detail/view.dart';
 import '../find_doctors/view.dart';
 
@@ -15,6 +16,7 @@ class PatientHomeView extends StatefulWidget {
 class _PatientHomeViewState extends State<PatientHomeView> {
   int selectedIndex = 0; // Dashboard active by default
   Map<String, dynamic>? selectedDoctorData;
+  Map<String, dynamic>? bookingDoctorData;
 
   final List<String> menuTitles = [
     'Dashboard',
@@ -46,6 +48,7 @@ class _PatientHomeViewState extends State<PatientHomeView> {
                     setState(() {
                       selectedIndex = index;
                       selectedDoctorData = null;
+                      bookingDoctorData = null;
                     });
                   },
                 ),
@@ -194,12 +197,15 @@ class _PatientHomeViewState extends State<PatientHomeView> {
   }
 
   Widget _buildTopNavLink(String label, int index) {
-    final bool isSelected = selectedIndex == index && selectedDoctorData == null;
+    final bool isSelected = selectedIndex == index &&
+        selectedDoctorData == null &&
+        bookingDoctorData == null;
     return InkWell(
       onTap: () {
         setState(() {
           selectedIndex = index;
           selectedDoctorData = null;
+          bookingDoctorData = null;
         });
       },
       borderRadius: BorderRadius.circular(6),
@@ -219,12 +225,35 @@ class _PatientHomeViewState extends State<PatientHomeView> {
 
   // ================= MAIN CONTENT PLACEHOLDER =================
   Widget _buildMainContentArea() {
+    if (bookingDoctorData != null) {
+      return BookAppointmentView(
+        doctorData: bookingDoctorData!,
+        onBack: () {
+          setState(() {
+            bookingDoctorData = null;
+          });
+        },
+        onBookingSuccess: () {
+          setState(() {
+            bookingDoctorData = null;
+            selectedDoctorData = null;
+            selectedIndex = 2; // Switch to My Appointments tab
+          });
+        },
+      );
+    }
+
     if (selectedDoctorData != null) {
       return DoctorDetailView(
         doctorData: selectedDoctorData!,
         onBack: () {
           setState(() {
             selectedDoctorData = null;
+          });
+        },
+        onBookAppointment: () {
+          setState(() {
+            bookingDoctorData = selectedDoctorData;
           });
         },
       );
