@@ -5,6 +5,7 @@ import '../../../widget/patient_sidebar.dart';
 import '../appointments/view.dart';
 import '../book_appointment/view.dart';
 import '../chat/view.dart';
+import '../dashboard/view.dart';
 import '../doctor_detail/view.dart';
 import '../documents/view.dart';
 import '../find_doctors/view.dart';
@@ -257,6 +258,24 @@ class _PatientHomeViewState extends State<PatientHomeView> {
         onBookAppointment: () {
           setState(() {
             bookingDoctorData = selectedDoctorData;
+          });
+        },
+      );
+    }
+
+    if (selectedIndex == 0) {
+      // Patient Dashboard View
+      return PatientDashboardView(
+        onNavigateTab: (tabIndex) {
+          setState(() {
+            selectedIndex = tabIndex;
+            selectedDoctorData = null;
+            bookingDoctorData = null;
+          });
+        },
+        onDoctorSelected: (docData) {
+          setState(() {
+            selectedDoctorData = docData;
           });
         },
       );
