@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widget/patient_sidebar.dart';
+import '../appointments/view.dart';
 import '../book_appointment/view.dart';
 import '../doctor_detail/view.dart';
 import '../find_doctors/view.dart';
@@ -268,6 +269,11 @@ class _PatientHomeViewState extends State<PatientHomeView> {
           });
         },
       );
+    }
+
+    if (selectedIndex == 2) {
+      // Appointments View
+      return const PatientAppointmentsView();
     }
 
     return Padding(
