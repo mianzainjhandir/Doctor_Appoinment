@@ -61,8 +61,8 @@ class _PatientHomeViewState extends State<PatientHomeView> {
                 Expanded(
                   child: Column(
                     children: [
-                      // Top Card Navigation Bar
-                      _buildTopNavBar(context),
+                      // Top Card Navigation Bar (Hide on Dashboard)
+                      if (selectedIndex != 0) _buildTopNavBar(context),
 
                       // Main Page Content
                       Expanded(
