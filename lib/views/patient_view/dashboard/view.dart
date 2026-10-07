@@ -624,6 +624,8 @@ class _PatientDashboardViewState extends State<PatientDashboardView> {
 
   // ================= QUICK STATS SECTION =================
   Widget _buildQuickStatsSection(User? currentUser) {
+    final String uid = currentUser?.uid ?? 'guest_patient';
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -651,44 +653,94 @@ class _PatientDashboardViewState extends State<PatientDashboardView> {
           ),
           const SizedBox(height: 16),
 
-          // 2x2 Grid Stats Cards
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 14,
-            mainAxisSpacing: 14,
-            childAspectRatio: 1.3,
-            children: [
-              _buildStatCard(
-                title: 'Total Appointments',
-                count: '5',
-                icon: Icons.event_note_rounded,
-                iconColor: const Color(0xFF2563EB),
-                bgColor: const Color(0xFFEFF6FF),
-              ),
-              _buildStatCard(
-                title: 'Documents Uploaded',
-                count: '3',
-                icon: Icons.assignment_outlined,
-                iconColor: const Color(0xFF0284C7),
-                bgColor: const Color(0xFFE0F2FE),
-              ),
-              _buildStatCard(
-                title: 'Reminders',
-                count: '2',
-                icon: Icons.alarm_rounded,
-                iconColor: const Color(0xFFD97706),
-                bgColor: const Color(0xFFFEF3C7),
-              ),
-              _buildStatCard(
-                title: 'Messages',
-                count: '1',
-                icon: Icons.chat_bubble_outline_rounded,
-                iconColor: const Color(0xFF7C3AED),
-                bgColor: const Color(0xFFF3E8FF),
-              ),
-            ],
+          // Live StreamBuilder for Appointments Count
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('appointments')
+                .snapshots(),
+            builder: (context, apptSnapshot) {
+              int totalAppts = 0;
+              if (apptSnapshot.hasData) {
+                totalAppts = apptSnapshot.data!.docs.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final String pId = data['patientId'] ?? '';
+                  return pId == uid || pId == 'guest_patient';
+                }).length;
+              }
+
+              // Live StreamBuilder for Documents Count
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('patient_documents')
+                    .snapshots(),
+                builder: (context, docSnapshot) {
+                  int totalDocs = 0;
+                  if (docSnapshot.hasData) {
+                    totalDocs = docSnapshot.data!.docs.where((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      final String pId = data['patientId'] ?? '';
+                      return pId == uid || pId == 'guest_patient';
+                    }).length;
+                  }
+
+                  // Live StreamBuilder for Messages/Chats Count
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('chats')
+                        .snapshots(),
+                    builder: (context, chatSnapshot) {
+                      int totalChats = 0;
+                      if (chatSnapshot.hasData) {
+                        totalChats = chatSnapshot.data!.docs.where((doc) {
+                          final data = doc.data() as Map<String, dynamic>;
+                          final String pId = data['patientId'] ?? '';
+                          return pId == uid || pId == 'guest_patient';
+                        }).length;
+                      }
+
+                      return GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: 14,
+                        mainAxisSpacing: 14,
+                        childAspectRatio: 1.3,
+                        children: [
+                          _buildStatCard(
+                            title: 'Total Appointments',
+                            count: '$totalAppts',
+                            icon: Icons.event_note_rounded,
+                            iconColor: const Color(0xFF2563EB),
+                            bgColor: const Color(0xFFEFF6FF),
+                          ),
+                          _buildStatCard(
+                            title: 'Documents Uploaded',
+                            count: '$totalDocs',
+                            icon: Icons.assignment_outlined,
+                            iconColor: const Color(0xFF0284C7),
+                            bgColor: const Color(0xFFE0F2FE),
+                          ),
+                          _buildStatCard(
+                            title: 'Reminders',
+                            count: '$totalAppts',
+                            icon: Icons.alarm_rounded,
+                            iconColor: const Color(0xFFD97706),
+                            bgColor: const Color(0xFFFEF3C7),
+                          ),
+                          _buildStatCard(
+                            title: 'Messages',
+                            count: '$totalChats',
+                            icon: Icons.chat_bubble_outline_rounded,
+                            iconColor: const Color(0xFF7C3AED),
+                            bgColor: const Color(0xFFF3E8FF),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
