@@ -5,6 +5,7 @@ import '../../../widget/patient_sidebar.dart';
 import '../appointments/view.dart';
 import '../book_appointment/view.dart';
 import '../doctor_detail/view.dart';
+import '../documents/view.dart';
 import '../find_doctors/view.dart';
 
 class PatientHomeView extends StatefulWidget {
@@ -274,6 +275,11 @@ class _PatientHomeViewState extends State<PatientHomeView> {
     if (selectedIndex == 2) {
       // Appointments View
       return const PatientAppointmentsView();
+    }
+
+    if (selectedIndex == 3) {
+      // Documents View
+      return const PatientDocumentsView();
     }
 
     return Padding(
