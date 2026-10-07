@@ -9,6 +9,7 @@ import '../dashboard/view.dart';
 import '../doctor_detail/view.dart';
 import '../documents/view.dart';
 import '../find_doctors/view.dart';
+import '../profile/view.dart';
 
 class PatientHomeView extends StatefulWidget {
   const PatientHomeView({super.key});
@@ -305,6 +306,11 @@ class _PatientHomeViewState extends State<PatientHomeView> {
     if (selectedIndex == 4) {
       // Chat View
       return const PatientChatView();
+    }
+
+    if (selectedIndex == 7 || selectedIndex == 8) {
+      // Profile / Settings View
+      return const PatientProfileView();
     }
 
     return Padding(
