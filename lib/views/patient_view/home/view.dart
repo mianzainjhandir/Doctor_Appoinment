@@ -9,7 +9,9 @@ import '../dashboard/view.dart';
 import '../doctor_detail/view.dart';
 import '../documents/view.dart';
 import '../find_doctors/view.dart';
+import '../history/view.dart';
 import '../profile/view.dart';
+import '../reminders/view.dart';
 
 class PatientHomeView extends StatefulWidget {
   const PatientHomeView({super.key});
@@ -306,6 +308,16 @@ class _PatientHomeViewState extends State<PatientHomeView> {
     if (selectedIndex == 4) {
       // Chat View
       return const PatientChatView();
+    }
+
+    if (selectedIndex == 5) {
+      // Reminders View
+      return const PatientRemindersView();
+    }
+
+    if (selectedIndex == 6) {
+      // History View
+      return const PatientHistoryView();
     }
 
     if (selectedIndex == 7 || selectedIndex == 8) {
