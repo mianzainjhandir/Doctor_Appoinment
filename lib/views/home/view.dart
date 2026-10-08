@@ -361,7 +361,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                               // Search Button
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Get.to(() => LogInPage());
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF3B82F6),
                                   foregroundColor: Colors.white,
