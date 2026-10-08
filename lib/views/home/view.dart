@@ -590,6 +590,26 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 20),
+
+        // Specialty Cards Row
+        SizedBox(
+          height: 120,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
+            itemCount: specialties.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 14),
+            itemBuilder: (context, index) {
+              final item = specialties[index];
+              return _buildSpecialtyCard(
+                title: item['title'] as String,
+                icon: item['icon'] as IconData,
+                iconColor: item['iconColor'] as Color,
+                bgColor: item['bgColor'] as Color,
+              );
+            },
+          ),
+        ),
       ],
     );
   }
