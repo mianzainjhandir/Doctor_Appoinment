@@ -16,7 +16,7 @@ class DocHomeView extends StatefulWidget {
 }
 
 class _DocHomeViewState extends State<DocHomeView> {
-  int selectedIndex = 1; // "Doctors" active tab by default
+  int selectedIndex = 0; // "Doctors" active tab by default
 
   final List<String> menuTitles = [
     'Dashboard',
