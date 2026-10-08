@@ -499,6 +499,57 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPopularSpecialtiesSection() {
+    final List<Map<String, dynamic>> specialties = [
+      {
+        'title': 'General Physician',
+        'icon': Icons.person_outline_rounded,
+        'bgColor': const Color(0xFFEFF6FF),
+        'iconColor': const Color(0xFF2563EB),
+      },
+      {
+        'title': 'Cardiologist',
+        'icon': Icons.favorite_border_rounded,
+        'bgColor': const Color(0xFFFEE2E2),
+        'iconColor': const Color(0xFFDC2626),
+      },
+      {
+        'title': 'Dermatologist',
+        'icon': Icons.clean_hands_outlined,
+        'bgColor': const Color(0xFFE0F2FE),
+        'iconColor': const Color(0xFF0284C7),
+      },
+      {
+        'title': 'Pediatrician',
+        'icon': Icons.child_care_rounded,
+        'bgColor': const Color(0xFFFEF3C7),
+        'iconColor': const Color(0xFFD97706),
+      },
+      {
+        'title': 'Gynecologist',
+        'icon': Icons.female_rounded,
+        'bgColor': const Color(0xFFF3E8FF),
+        'iconColor': const Color(0xFF7C3AED),
+      },
+      {
+        'title': 'Orthopedic',
+        'icon': Icons.align_horizontal_left_rounded,
+        'bgColor': const Color(0xFFDCFCE7),
+        'iconColor': const Color(0xFF16A34A),
+      },
+      {
+        'title': 'Neurologist',
+        'icon': Icons.psychology_outlined,
+        'bgColor': const Color(0xFFE0E7FF),
+        'iconColor': const Color(0xFF4F46E5),
+      },
+      {
+        'title': 'More',
+        'icon': Icons.show_chart_rounded,
+        'bgColor': const Color(0xFFF1F5F9),
+        'iconColor': const Color(0xFF64748B),
+      },
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
