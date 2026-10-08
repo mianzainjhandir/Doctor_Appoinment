@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../widget/doctor_sidebar.dart';
 import '../add_doctor/view.dart';
+import '../appointments/view.dart';
+import '../dashboard/view.dart';
 import '../doctors_list/view.dart';
+import '../messages/view.dart';
+import '../patients/view.dart';
 
 class DocHomeView extends StatefulWidget {
   const DocHomeView({super.key});
@@ -131,6 +135,21 @@ class _DocHomeViewState extends State<DocHomeView> {
   // ================= MAIN CONTENT SWITCHER =================
   Widget _buildMainContentArea() {
     switch (selectedIndex) {
+      case 0:
+        // Admin Dashboard Overview
+        return AdminDashboardView(
+          onNavigateToAddDoctor: () {
+            setState(() {
+              selectedIndex = 2;
+            });
+          },
+          onNavigateToAppointments: () {
+            setState(() {
+              selectedIndex = 3;
+            });
+          },
+        );
+
       case 1:
         // Doctors Directory List
         return DoctorsListView(
@@ -151,31 +170,25 @@ class _DocHomeViewState extends State<DocHomeView> {
           },
         );
 
+      case 3:
+        // Admin Appointments Management
+        return const AdminAppointmentsView();
+
+      case 4:
+        // Admin Patients Directory
+        return const AdminPatientsView();
+
+      case 6:
+        // Doctor Messages / Consultation Chat
+        return const DoctorMessagesView();
+
       default:
-        // Default Placeholder View for other menu tabs
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Center(
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: Center(
-                child: Text(
-                  '${menuTitles[selectedIndex]} Content Area',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF64748B),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        return DoctorsListView(
+          onAddDoctorPressed: () {
+            setState(() {
+              selectedIndex = 2;
+            });
+          },
         );
     }
   }
