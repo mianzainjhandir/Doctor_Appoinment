@@ -485,11 +485,61 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 40),
+
+                // Popular Specialties Section
+                _buildPopularSpecialtiesSection(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPopularSpecialtiesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Popular Specialties',
+              style: GoogleFonts.poppins(
+                color: const Color(0xFF1E1B4B),
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Get.to(() => LogInPage());
+              },
+              child: Row(
+                children: [
+                  Text(
+                    'View All',
+                    style: GoogleFonts.poppins(
+                      color: const Color(0xFF2563EB),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Color(0xFF2563EB),
+                    size: 16,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
     );
   }
 
